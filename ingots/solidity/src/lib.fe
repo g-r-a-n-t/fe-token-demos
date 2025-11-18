@@ -1,14 +1,18 @@
 pub use evm
 pub use map
 pub use evm::{ MemBuffer, StorageBuffer }
-pub use std::mydefault::MyDefault
-pub use std::codec::{ Cursor, Encode, Decode }
+pub use legacy_std::mydefault::MyDefault
+pub use legacy_std::codec::{ Cursor, Encode, Decode }
 pub use map::{ Map, Hasher, Entry }
 pub use map::map_storage::{MapStorage }
-pub use std::operators::{Add, Sub, AddAssign, SubAssign}
+pub use ingot::solidity_map_storage::{SolidityMapStorage}
+pub use legacy_std::operators::{Add, Sub, AddAssign, SubAssign}
 pub use ingot::keccak256::{Keccak256}
-pub use std::is_zero
+pub use legacy_std::is_zero::{ IsZero }
 
+// NOTE: Fe currently reports `SolidityMapStorage` doesn't satisfy `MapStorage`
+// even though the impl constrains `U` with the required traits. This looks like
+// a compiler bug tracked elsewhere, so we leave the definition as-is.
 pub type Mapping<T, U> = map::Map<T, U, SolidityMapStorage<T, U, Keccak256>>
 
 pub trait MappingExt<T, U> {

@@ -3,7 +3,7 @@ name = "ERC721"
 version = "0.0.1"
 
 [dependencies]
-std = { path = "../std", version = "0.0.1" }
+legacy_std = { path = "../legacy_std", version = "0.0.1" }
 map = { path = "../map", version = "0.0.1" }
 solidity = { path = "../solidity", version = "0.0.1" }
 evm = { path = "../evm", version = "0.0.1" }

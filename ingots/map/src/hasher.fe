@@ -1,4 +1,4 @@
-use std::codec::{Encode}
+use legacy_std::codec::{Encode}
 
 pub trait Hasher {
     fn hash<T: Encode>(mut self, key: T) -> u256

@@ -25,14 +25,14 @@ Example output:
 $ fe tree ingots/ERC20
 ERC20 v0.0.1
 ├── map v0.0.1
-│   └── std v0.0.1
+│   └── legacy_std v0.0.1
 ├── solidity v0.0.1
 │   ├── map v0.0.1
-│   │   └── std v0.0.1
+│   │   └── legacy_std v0.0.1
 │   ├── evm v0.0.1
-│   │   └── std v0.0.1
-│   └── std v0.0.1
-└── std v0.0.1
+│   │   └── legacy_std v0.0.1
+│   └── legacy_std v0.0.1
+└── legacy_std v0.0.1
 ```
 
 ## License

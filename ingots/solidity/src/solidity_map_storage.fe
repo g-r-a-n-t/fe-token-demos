@@ -1,6 +1,6 @@
-pub use std::mydefault::MyDefault
-pub use std::codec::{ Cursor, Encode, Decode }
-pub use std::is_zero::{ IsZero }
+pub use legacy_std::mydefault::MyDefault
+pub use legacy_std::codec::{ Cursor, Encode, Decode }
+pub use legacy_std::is_zero::{ IsZero }
 
 pub struct SolidityMapStorage<T, U, H: map::Hasher> {
     pub hasher: H

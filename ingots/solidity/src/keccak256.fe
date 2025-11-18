@@ -1,4 +1,4 @@
-pub use std::codec::{ Cursor, Encode, Decode }
+pub use legacy_std::codec::{ Cursor, Encode, Decode }
 
 pub struct Keccak256 {
     pub slot: u256

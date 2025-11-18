@@ -2,6 +2,8 @@ extern {
     pub fn todo() -> !
 }
 
+use core::option::{Option}
+
 pub trait IntUpcast<To> {
     fn upcast(self) -> To
 }
@@ -21,7 +23,7 @@ pub impl IntUpcast<u256> for usize {
 pub trait IntDowncast<To> {
     fn downcast_truncate(self) -> To
     fn downcast_saturate(self) -> To
-    // fn downcast(self) -> Option<To> // Option is in core lib, which isn't visible in lsp (see grant's PR)
+    fn downcast(self) -> Option<To>
 }
 
 pub impl IntDowncast<u8> for u256 {
@@ -31,6 +33,9 @@ pub impl IntDowncast<u8> for u256 {
     fn downcast_saturate(self) -> u8 {
         todo()
     }
+    fn downcast(self) -> Option<u8> {
+        todo()
+    }
 }
 
 pub impl IntDowncast<usize> for u256 {
@@ -38,6 +43,9 @@ pub impl IntDowncast<usize> for u256 {
         todo()
     }
     fn downcast_saturate(self) -> usize {
+        todo()
+    }
+    fn downcast(self) -> Option<usize> {
         todo()
     }
 }
