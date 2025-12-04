@@ -6,3 +6,4 @@ version = "0.0.1"
 legacy_std = { path = "../legacy_std", version = "0.0.1" }
 map = { path = "../map", version = "0.0.1" }
 solidity = { path = "../solidity", version = "0.0.1" }
+remote_solidity = { source = "https://github.com/g-r-a-n-t/fe-token-demos.git", rev = "0a0c9c67b308ba86d53730647fe172ecdd668aa4", path = "ingots/solidity" }
