@@ -3,6 +3,6 @@ name = "ERC20"
 version = "0.0.1"
 
 [dependencies]
-legacy_std = { path = "../legacy_std", version = "0.0.1" }
-map = { path = "../map", version = "0.0.1" }
-solidity = { path = "../solidity", version = "0.0.1" }
+legacy_std = true
+map = true
+solidity = true
