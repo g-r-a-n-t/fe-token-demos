@@ -1,0 +1,11 @@
+[workspace]
+name = "fe-token-demos"
+version = "0.0.1"
+members = [
+  { path = "ingots/ERC20", name = "ERC20" },
+  { path = "ingots/ERC721", name = "ERC721" },
+  { path = "ingots/evm", name = "evm" },
+  { path = "ingots/legacy_std", name = "legacy_std" },
+  { path = "ingots/map", name = "map" },
+  { path = "ingots/solidity", name = "solidity" },
+]
