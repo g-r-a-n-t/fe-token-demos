@@ -1,74 +1,97 @@
-use evm
-use solidity::map
+use std::evm::{Address, Ctx, StorageMap}
+use std::evm::effects::assert
 
-contract ERC721 {
-    pub owner_of: solidity::Mapping<u256, evm::Address>,
-    pub approved: solidity::Mapping<u256, evm::Address>,
-    pub balance: solidity::Mapping<evm::Address, u256>,
-    pub NAME: String<20>,
-    pub SYMBOL: String<5>
+msg Erc721 {
+    #[selector = 0x06fdde03]
+    Name -> u256,
+
+    #[selector = 0x95d89b41]
+    Symbol -> u256,
+
+    #[selector = 0x70a08231]
+    BalanceOf { owner: Address } -> u256,
+
+    #[selector = 0x6352211e]
+    OwnerOf { token_id: u256 } -> Address,
+
+    #[selector = 0x095ea7b3]
+    Approve { to: Address, token_id: u256 },
+
+    #[selector = 0x081812fc]
+    GetApproved { token_id: u256 } -> Address,
+
+    #[selector = 0x23b872dd]
+    TransferFrom { from: Address, to: Address, token_id: u256 },
+
+    #[selector = 0x40c10f19]
+    Mint { to: Address, token_id: u256 },
 }
 
-impl ERC721 {
-    pub fn constructor(mut self, name: String<20>, symbol: String<5>) {
-        self.NAME = name
-        self.SYMBOL = symbol
-        self.owner_of.new(slot: 0)
-        self.approved.new(slot: 1)
-        self.balance.new(slot: 2)
+struct NftStore {
+    owner_of: StorageMap<u256, u256, 0>,
+    approved: StorageMap<u256, u256, 1>,
+    balances: StorageMap<Address, u256, 2>,
+}
+
+pub contract ERC721 uses (ctx: Ctx) {
+    mut store: NftStore
+
+    init() uses (mut store) {
+        // StorageMaps are empty by default.
     }
 
-    pub fn name(self) -> String<20> {
-        self.NAME
-    }
+    recv Erc721 {
+        Name -> u256 { 0x46654e4654 }
+        Symbol -> u256 { 0x46454e4654 }
 
-    pub fn symbol(self) -> String<5> {
-        self.SYMBOL
-    }
-
-    pub fn ownerOf(self, token_id: u256) -> evm::Address {
-        let owner = self.owner_of.get(key: token_id)
-        if owner == 0 {
-            evm::__revert()
+        BalanceOf { owner } -> u256 uses (store) {
+            store.balances.get(key: owner)
         }
-        owner
-    }
 
-    pub fn balanceOf(self, owner: evm::Address) -> u256 {
-        self.balance.get(key: owner)
-    }
-
-    pub fn approve(mut self, to: evm::Address, token_id: u256) {
-        let owner = self.owner_of.get(key: token_id)
-        if owner != evm::__caller() {
-            evm::__revert()
+        OwnerOf { token_id } -> Address uses (store) {
+            let owner_inner = store.owner_of.get(key: token_id)
+            assert(owner_inner != 0)
+            Address { inner: owner_inner }
         }
-        self.approved.set(key: token_id, value: to)
-        ()
-    }
 
-    pub fn getApproved(self, token_id: u256) -> evm::Address {
-        self.approved.get(key: token_id)
-    }
-
-    pub fn transferFrom(mut self, from: evm::Address, to: evm::Address, token_id: u256) {
-        let owner = self.owner_of.get(key: token_id)
-        let approved = self.approved.get(key: token_id)
-        let caller = evm::__caller()
-        if owner != from || (caller != owner && caller != approved) {
-            evm::__revert()
+        Approve { to, token_id } uses (mut store, ctx) {
+            let owner_inner = store.owner_of.get(key: token_id)
+            assert(owner_inner != 0)
+            assert(owner_inner == ctx.caller().inner)
+            store.approved.set(key: token_id, value: to.inner)
         }
-        self.owner_of.set(key: token_id, value: to)
-        self.approved.set(key: token_id, value: 0)
-        self.balance.entry(key: from).sub_assign(rhs: 1)
-        self.balance.entry(key: to).add_assign(rhs: 1)
-    }
 
-    pub fn mint(mut self, to: evm::Address, token_id: u256) {
-        if self.owner_of.get(key: token_id) != 0 {
-            evm::__revert()
+        GetApproved { token_id } -> Address uses (store) {
+            Address { inner: store.approved.get(key: token_id) }
         }
-        self.owner_of.set(key: token_id, value: to)
-        self.balance.entry(key: to).add_assign(rhs: 1)
+
+        TransferFrom { from, to, token_id } uses (mut store, ctx) {
+            assert(to != Address::zero())
+
+            let owner_inner = store.owner_of.get(key: token_id)
+            assert(owner_inner == from.inner)
+
+            let caller = ctx.caller()
+            let approved_inner = store.approved.get(key: token_id)
+            assert(caller.inner == owner_inner || caller.inner == approved_inner)
+
+            store.owner_of.set(key: token_id, value: to.inner)
+            store.approved.set(key: token_id, value: 0)
+
+            let from_bal = store.balances.get(key: from)
+            assert(from_bal > 0)
+            store.balances.set(key: from, value: from_bal - 1)
+            store.balances.set(key: to, value: store.balances.get(key: to) + 1)
+        }
+
+        Mint { to, token_id } uses (mut store) {
+            assert(to != Address::zero())
+
+            let owner_inner = store.owner_of.get(key: token_id)
+            assert(owner_inner == 0)
+
+            store.owner_of.set(key: token_id, value: to.inner)
+            store.balances.set(key: to, value: store.balances.get(key: to) + 1)
+        }
     }
 }
